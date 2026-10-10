@@ -80,97 +80,46 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	// r1 hold intake, r2 hold outtake
-	// l1 toggle indexer toggle
-	// l2 toggle tongue mech
-	// a toogle intake (slow)
-	// up toggle wing
-	// y toggles intake method
+	// R2:Intake
+	// L2:outtake
+	// R1:raise cascade
+	// L1:lower cascade
+	// Y: arm up
+	// right arrow: arm down
 
-	bool intakeState = false; // intake toggle mode or not toggle, false = no toggle
-	bool intakeForward = false;
-	bool intakeBackward = false;
-
-	int intakeVoltage = 127;
-	int middleIntakeSpeed = 350;
 
 	while (true) {
 
 		// drivetrain
-		int vertical = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y); // Y axis of the left joystick
-        int horizontal = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X); // X axis of the right joystick
-		chassis.arcade(vertical, horizontal, false, 0.75); // arcarde drive
+		int left = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y); // Y axis of the left joystick
+        int right = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y); // Y axis of the right joystick
+		chassis.tank(left, right); // tank drive
 
-		// intake
-		if (intakeState) {
-			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
-				if (intakeForward) {
-					intake.move(0);
-				} else {
-					intake.move(intakeVoltage);
-					intakeBackward = false;
-				}
-				intakeForward = !intakeForward;
-			} else if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-				if (intakeBackward) {
-					intake.move(0);
-				} else {
-					intake.move(-intakeVoltage);
-					intakeForward = false;
-				}
-				intakeBackward = !intakeBackward;
-			}
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			intake.move(127);
+		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			intake.move(-127);
 		} else {
-			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(intakeVoltage);
-			else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move(-intakeVoltage);
-			else intake.move(0);
+			intake.move(0);
 		}
 
-		// toggle intake input method
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-			intakeState = !intakeState;
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			cascade.move(127);
+		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+			cascade.move(-127);
+		} else {
+			cascade.move(0);
 		}
+		
+		arm.set_brake_mode(pros::v5::MotorBrake::hold);
 
-		// toggle intake speed
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-			if (intakeVoltage == 127) intakeVoltage = middleIntakeSpeed * 127 / 600;
-			else intakeVoltage = 127;
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+			arm.move(75);
+		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+			arm.move(-75);
+		} else {
+			arm.brake();
 		}
-
-		// tongue mech
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
-			tongueMech.toggle();
-		}
-
-		// wing
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) {
-			wing.toggle();
-		}
-
-		// triple state
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
-			tripleStateMech.setState(TripleStateMechStates::Middle);
-		} else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-			tripleStateMech.setState(TripleStateMechStates::Index);
-		} else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-			tripleStateMech.setState(TripleStateMechStates::High);
-		}
-
-		/*if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-			// set position to x:0, y:0, heading:0
-			chassis.setPose(0, 0, 0);
-			// turn to face heading 90 with a very long timeout
-			chassis.turnToHeading(180, 1000);
-			chassis.waitUntilDone();
-			chassis.turnToHeading(0, 1000);
-		}
-
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-			// set position to x:0, y:0, heading:0
-			chassis.setPose(0, 0, 0);
-			// turn to face heading 90 with a very long timeout
-			chassis.turnToHeading(90, 1000);
-		}*/
 
 		pros::delay(20); // Run for 20 ms then update
 	}
