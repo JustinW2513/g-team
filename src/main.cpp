@@ -1,6 +1,4 @@
 #include "main.h"
-#include "config.hpp"
-#include "pros/misc.h"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -11,6 +9,9 @@
 void initialize() {
 	pros::lcd::initialize();
 	chassis.calibrate();
+
+	arm.set_brake_mode(pros::v5::MotorBrake::hold);
+	arm.tare_position();
 	
 	pros::Task screenTask([&]() {
 		while (true) {
@@ -84,9 +85,10 @@ void opcontrol() {
 	// L2:outtake
 	// R1:raise cascade
 	// L1:lower cascade
-	// Y: arm up
+	// Y: arm up / 90 then 45 
 	// right arrow: arm down
 
+	bool macro = true;
 
 	while (true) {
 
@@ -111,15 +113,35 @@ void opcontrol() {
 			cascade.move(0);
 		}
 		
-		arm.set_brake_mode(pros::v5::MotorBrake::hold);
-
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
-			arm.move(75);
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-			arm.move(-75);
+		if (macro) {
+			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+				if (arm.get_position() <= 576) {
+					arm.move_absolute(576, 100);
+				} else if (arm.get_position() > 576) {
+					arm.move_absolute(864, 100);
+				}
+			}
+			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+				if (arm.get_position() <= 576) {
+					arm.move_absolute(0, 100);
+				} else if (arm.get_position() > 576) {
+					arm.move_absolute(576, 100);
+				}
+			}
 		} else {
-			arm.brake();
+			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+				arm.move(75);
+			} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+				arm.move(-50);
+			} else {
+				arm.brake();
+			}
 		}
+
+		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+			macro = !macro;
+		}
+		
 
 		pros::delay(20); // Run for 20 ms then update
 	}

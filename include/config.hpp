@@ -1,10 +1,6 @@
 #pragma once
 
 #include "lemlib/api.hpp"
-#include "pros/abstract_motor.hpp"
-#include "pros/motor_group.hpp"
-#include "pros/motors.h"
-#include "pros/motors.hpp"
 
 namespace config {
     // Drivetrain
@@ -18,7 +14,7 @@ namespace config {
     inline const std::initializer_list<int8_t> left_motor_ports = {8, 15};
 
     
-    inline const int8_t intake_motor_port = 11; // Intake
+    inline const int8_t intake_motor_port = -11; // Intake
     inline const std::initializer_list<int8_t> cascade_motor_ports = {5, 6}; // Cascade
     inline const std::initializer_list<int8_t> claw_motor_ports = {11, 13}; // Claw
     inline const int8_t arm_motor_port = 14; // Arm
