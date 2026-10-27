@@ -1,4 +1,6 @@
 #include "main.h"
+#include "config.hpp"
+#include "pros/misc.h"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -9,6 +11,8 @@
 void initialize() {
 	pros::lcd::initialize();
 	chassis.calibrate();
+
+	cascade.set_brake_mode(pros::v5::MotorBrake::hold);
 
 	arm.set_brake_mode(pros::v5::MotorBrake::hold);
 	arm.tare_position();
@@ -108,16 +112,20 @@ void opcontrol() {
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			cascade.move(127);
 		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-			cascade.move(-127);
+			cascade.move(-50);
 		} else {
-			cascade.move(0);
+			cascade.brake();
+		}
+
+		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+			uprightMech.toggle();
 		}
 		
 		if (macro) {
 			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-				if (arm.get_position() <= 576) {
+				if (arm.get_position() < 570) {
 					arm.move_absolute(576, 100);
-				} else if (arm.get_position() > 576) {
+				} else if (arm.get_position() >= 570) {
 					arm.move_absolute(864, 100);
 				}
 			}

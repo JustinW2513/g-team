@@ -14,12 +14,12 @@ namespace config {
     inline const std::initializer_list<int8_t> left_motor_ports = {8, 15};
 
     
-    inline const int8_t intake_motor_port = -11; // Intake
-    inline const std::initializer_list<int8_t> cascade_motor_ports = {5, 6}; // Cascade
+    inline const int8_t intake_motor_port = 11; // Intake
+    inline const std::initializer_list<int8_t> cascade_motor_ports = {4, -6}; // Cascade
     inline const std::initializer_list<int8_t> claw_motor_ports = {11, 13}; // Claw
     inline const int8_t arm_motor_port = 14; // Arm
 
-    //inline const char tongue_ADI = 'B';
+    inline const char upright_ADI = 'A';
     //inline const char wing_ADI = 'F';
     //inline const char middle_goal_top_ADI = 'H';
     //inline const char middle_goal_bottom_ADI = 'A';
@@ -77,8 +77,7 @@ inline pros::Motor arm(config::arm_motor_port, pros::MotorGearset::blue, pros::v
 inline lemlib::Drivetrain driveTrain(&leftMotorGroup, &rightMotorGroup, config::dt_track_width, config::dt_wheel_diameter, config::dt_rpm, config::dt_horizontal_drift);
 
 // Pneumatics
-//inline pros::adi::Pneumatics tongueMech(config::tongue_ADI, false);
-//inline pros::adi::Pneumatics wing(config::wing_ADI, false);
+inline pros::adi::Pneumatics uprightMech(config::upright_ADI, false);
 
 // Imu
 inline pros::Imu imu(config::imu_port);
