@@ -110,11 +110,11 @@ void autonomous() {
 void opcontrol() {
 	// R2:Intake
 	// L2:outtake
-	// R1:raise cascade
-	// L1:lower cascade
+	// R1:next arm step
+	// L1:previous arm step
 	// UP: toggle upright mech
-	// Y: next arm step
-	// right arrow: previous arm step
+	// Y: raise cascade
+	// right arrow: lower cascade
 
 	bool macro = true;
 
@@ -133,9 +133,9 @@ void opcontrol() {
 			intake.move(0);
 		}
 
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
 			cascade.move(127);
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) && cascade.get_position() > minCascadeHeight) {
+		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT) && cascade.get_position() > minCascadeHeight) {
 			cascade.move(-50);
 		} else {
 			cascade.brake();
@@ -153,9 +153,9 @@ void opcontrol() {
 				previousStep();
 			}
 		} else {
-			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 				arm.move(75);
-			} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+			} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 				arm.move(-50);
 			} else {
 				arm.brake();
