@@ -16,8 +16,7 @@ namespace config {
     
     inline const int8_t intake_motor_port = 11; // Intake
     inline const std::initializer_list<int8_t> cascade_motor_ports = {4, -6}; // Cascade
-    inline const std::initializer_list<int8_t> claw_motor_ports = {11, 13}; // Claw
-    inline const int8_t arm_motor_port = 14; // Arm
+    inline const std::initializer_list<int8_t> arm_motor_ports = {14, 19}; // Arm
 
     inline const char upright_ADI = 'A';
     //inline const char wing_ADI = 'F';
@@ -69,9 +68,8 @@ inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 inline pros::MotorGroup leftMotorGroup(config::left_motor_ports, pros::MotorGearset::blue);
 inline pros::MotorGroup rightMotorGroup(config::right_motor_ports, pros::MotorGearset::blue);
 inline pros::Motor intake(config::intake_motor_port, pros::MotorGearset::blue);
-inline pros::MotorGroup cascade(config::cascade_motor_ports, pros::MotorGearset::blue);
-inline pros::MotorGroup claw(config::claw_motor_ports, pros::MotorGearset::blue);
-inline pros::Motor arm(config::arm_motor_port, pros::MotorGearset::blue, pros::v5::MotorUnits::degrees);
+inline pros::MotorGroup cascade(config::cascade_motor_ports, pros::MotorGearset::green);
+inline pros::MotorGroup arm(config::arm_motor_ports);
 
 // Drive train settings
 inline lemlib::Drivetrain driveTrain(&leftMotorGroup, &rightMotorGroup, config::dt_track_width, config::dt_wheel_diameter, config::dt_rpm, config::dt_horizontal_drift);

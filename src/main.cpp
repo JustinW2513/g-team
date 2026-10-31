@@ -2,6 +2,12 @@
 #include "config.hpp"
 #include "pros/misc.h"
 
+int minCascadeHeight = 0;
+
+int currentStep = 0;
+int maxStep = 4;
+int stepPositions[] = {0, 200, 250, 500, 750};
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -13,6 +19,7 @@ void initialize() {
 	chassis.calibrate();
 
 	cascade.set_brake_mode(pros::v5::MotorBrake::hold);
+	cascade.tare_position();
 
 	arm.set_brake_mode(pros::v5::MotorBrake::hold);
 	arm.tare_position();
@@ -29,6 +36,19 @@ void initialize() {
 			pros::delay(50);
 		}
 	});
+}
+
+void setStep(int step) {
+	currentStep = std::clamp(step, 0, maxStep);
+	arm.move_absolute(stepPositions[currentStep], 100);
+}
+
+void nextStep() {
+	setStep(currentStep + 1);
+}
+
+void previousStep() {
+	setStep(currentStep - 1);
 }
 
 /**
@@ -69,6 +89,9 @@ void autonomous() {
 	//chassis.turnToHeading(0, 1000);
     //chassis.moveToPoint(0, 20, 100000);
 	//auton();
+	chassis.setPose(0, 0, 0);
+	chassis.moveToPoint(0, 20, 100000);
+	chassis.waitUntilDone();
 }
 
 /**
@@ -87,10 +110,11 @@ void autonomous() {
 void opcontrol() {
 	// R2:Intake
 	// L2:outtake
-	// R1:raise cascade
-	// L1:lower cascade
-	// Y: arm up / 90 then 45 
-	// right arrow: arm down
+	// R1:next arm step
+	// L1:previous arm step
+	// UP: toggle upright mech
+	// Y: raise cascade
+	// right arrow: lower cascade
 
 	bool macro = true;
 
@@ -109,9 +133,9 @@ void opcontrol() {
 			intake.move(0);
 		}
 
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
 			cascade.move(127);
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT) && cascade.get_position() > minCascadeHeight) {
 			cascade.move(-50);
 		} else {
 			cascade.brake();
@@ -120,26 +144,18 @@ void opcontrol() {
 		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
 			uprightMech.toggle();
 		}
-		
+
 		if (macro) {
 			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-				if (arm.get_position() < 570) {
-					arm.move_absolute(576, 100);
-				} else if (arm.get_position() >= 570) {
-					arm.move_absolute(864, 100);
-				}
+				nextStep();
 			}
 			if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-				if (arm.get_position() <= 576) {
-					arm.move_absolute(0, 100);
-				} else if (arm.get_position() > 576) {
-					arm.move_absolute(576, 100);
-				}
+				previousStep();
 			}
 		} else {
-			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+			if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 				arm.move(75);
-			} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+			} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 				arm.move(-50);
 			} else {
 				arm.brake();
