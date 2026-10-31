@@ -36,9 +36,9 @@ namespace config {
     inline const double horizontal_wheel_distance = 0;
 
     // Lateral PID
-    inline const double lateral_kP = 1;
+    inline const double lateral_kP = 10;
     inline const double lateral_kI = 0;
-    inline const double lateral_kD = 1;
+    inline const double lateral_kD = 3;
 
     inline const double lateral_anti_windup = 3;
     inline const double lateral_small_error_range = 1;
@@ -48,9 +48,9 @@ namespace config {
     inline const double lateral_slew = 20;
 
      // Angular PID
-    inline const double angular_kP = 1;
+    inline const double angular_kP = 2;
     inline const double angular_kI = 0;
-    inline const double angular_kD = 1;
+    inline const double angular_kD = 10;
 
     inline const double angular_anti_windup = 3;
     inline const double angular_small_error_range = 1;
